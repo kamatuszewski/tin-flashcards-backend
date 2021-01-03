@@ -5,7 +5,6 @@ import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategy/jwt.strategy';
-import { LocalStrategy } from './strategy/local.strategy';
 
 @Module({
   imports: [UsersModule, PassportModule, JwtModule.registerAsync({
@@ -14,7 +13,7 @@ import { LocalStrategy } from './strategy/local.strategy';
       signOptions: {expiresIn: process.env.JWT_EXPIRES_IN}
     })
   })],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, JwtStrategy],
   exports: [AuthService],
   controllers: [AuthController]
 })

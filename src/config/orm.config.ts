@@ -9,6 +9,9 @@ export const ormConfig = {
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  entities: ["dist/**/**.entity{.ts,.js}"],
-  //synchronize: false,
+  entities: ["src/**/**.entity.ts"],
+  synchronize: true,
+  cli: {
+    entitiesDir: "src/entity"
+  }
 } as TypeOrmModuleOptions
