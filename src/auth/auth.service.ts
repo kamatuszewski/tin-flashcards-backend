@@ -4,6 +4,7 @@ import { User } from '../entity/user.entity';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 import { IJwtAccessToken } from './interfaces/jwt-access-token.interface';
 import { IJwtSign } from './interfaces/jwt-sign.interface';
 
@@ -27,7 +28,6 @@ export class AuthService {
     if (!verifyCredentials) {
       throw new UnauthorizedException();
     }
-
     const userInDb = await this.usersService.findOne(user.login);
     const payload: IJwtSign = { username: user.login, sub: userInDb.id_user };
 
@@ -36,7 +36,7 @@ export class AuthService {
     }
   }
 
-  public async register(body: any) {
-    return await this.usersService.create(body);
+  public async register(registerDto: RegisterDto) {
+    return await this.usersService.create(registerDto);
   }
 }

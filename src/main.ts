@@ -8,7 +8,9 @@ dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
-  console.log('Server started on port', process.env.PORT);
+  app.enableCors({
+    allowedHeaders: "*"
+  })
   await app.listen(process.env.PORT);
 }
 bootstrap();

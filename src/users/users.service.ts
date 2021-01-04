@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
+import { RegisterDto } from '../auth/dto/register.dto';
 import { User } from '../entity/user.entity';
 
 @Injectable()
@@ -15,8 +16,8 @@ export class UsersService {
     });
   }
 
-  public async create(body: any): Promise<boolean> {
-    const { login, email, password } = body;
+  public async create(registerDto: RegisterDto): Promise<boolean> {
+    const { login, email, password } = registerDto;
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -33,7 +34,7 @@ export class UsersService {
     });
 
     if (userInDb || emailInDb) {
-      throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+      throw new HttpException('USER_ALREADY_EXISTS', HttpStatus.BAD_REQUEST);
     }
 
     const userr: User = await this.usersRepository.create(user);
