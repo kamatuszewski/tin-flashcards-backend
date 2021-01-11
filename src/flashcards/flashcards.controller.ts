@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { Flashcard } from './flashcard';
 import { Flashcards } from './flashcards';
 import { FlashcardsService } from './flashcards.service';

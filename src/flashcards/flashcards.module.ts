@@ -4,6 +4,6 @@ import { FlashcardsController } from './flashcards.controller';
 
 @Module({
   providers: [FlashcardsService],
-  controllers: [FlashcardsController]
+  controllers: [FlashcardsController],
 })
 export class FlashcardsModule {}

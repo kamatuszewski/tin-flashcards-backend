@@ -1,4 +1,14 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
+import { Role } from './role.entity';
+import { Category } from './category.entity';
+import { Flashcardbase } from "./flashcardbase.entity";
 
 @Entity()
 export class User {
@@ -14,9 +24,22 @@ export class User {
   @Column()
   email: string;
 
-  @Column({default: Date.now().toLocaleString()})
+  @Column({ default: Date.now().toLocaleString() })
   created_at: string;
 
-  @Column({default: Date.now().toLocaleString()})
+  @Column({ default: Date.now().toLocaleString() })
   updated_at: string;
+
+  @ManyToOne(() => Role, (role: Role) => role.users)
+  @JoinColumn()
+  role: Role;
+
+  @OneToMany(() => Category, (category: Category) => category.creator)
+  categories: Category[];
+
+  @OneToMany(
+    () => Flashcardbase,
+    (flashcardbase: Flashcardbase) => flashcardbase.creator,
+  )
+  flashcardbases: Flashcardbase[];
 }

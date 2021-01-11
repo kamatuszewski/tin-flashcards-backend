@@ -7,15 +7,18 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategy/jwt.strategy';
 
 @Module({
-  imports: [UsersModule, PassportModule, JwtModule.registerAsync({
-    useFactory: async () => ({
-      secret: process.env.JWT_SECRET,
-      signOptions: {expiresIn: process.env.JWT_EXPIRES_IN}
-    })
-  })],
+  imports: [
+    UsersModule,
+    PassportModule,
+    JwtModule.registerAsync({
+      useFactory: async () => ({
+        secret: process.env.JWT_SECRET,
+        signOptions: { expiresIn: process.env.JWT_EXPIRES_IN },
+      }),
+    }),
+  ],
   providers: [AuthService, JwtStrategy],
   exports: [AuthService],
-  controllers: [AuthController]
+  controllers: [AuthController],
 })
-export class AuthModule {
-}
+export class AuthModule {}

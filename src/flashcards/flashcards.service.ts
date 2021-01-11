@@ -9,9 +9,9 @@ export class FlashcardsService {
       id: 1,
       description: 'sadddddddddddddddddddddddddddddd',
       title: 'tytul',
-      cover: 'cover'
-    }
-  }
+      cover: 'cover',
+    },
+  };
 
   public findAll(): Flashcards {
     return this.flashcards;
@@ -19,23 +19,23 @@ export class FlashcardsService {
 
   public create(newFlashcard: Flashcard): void {
     const id = Date.now();
-    this.flashcards[id] = {...newFlashcard, id }
+    this.flashcards[id] = { ...newFlashcard, id };
   }
 
   public find(id: number): Flashcard {
     const flashCard = this.flashcards[id];
-    if (!flashCard) throw new Error("No flashcards found.")
+    if (!flashCard) throw new Error('No flashcards found.');
     return flashCard;
   }
 
   public update(payload: Flashcard): void {
-    if (!this.flashcards[payload.id]) throw new Error("No flashcards found.")
+    if (!this.flashcards[payload.id]) throw new Error('No flashcards found.');
     this.flashcards[payload.id] = payload;
   }
 
   public delete(id: number): void {
     const flashcard: Flashcard = this.flashcards[id];
-    if (!flashcard) throw new Error("No flashcards found.");
+    if (!flashcard) throw new Error('No flashcards found.');
     delete this.flashcards[id];
   }
 }

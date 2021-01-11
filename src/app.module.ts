@@ -10,14 +10,21 @@ import { UsersModule } from './users/users.module';
 import { AppService } from './app.service';
 
 @Module({
-  imports: [FlashcardsModule, AuthModule, UsersModule, TypeOrmModule.forRootAsync({
-    useFactory: async () => ormConfig
-  })],
+  imports: [
+    FlashcardsModule,
+    AuthModule,
+    UsersModule,
+    TypeOrmModule.forRootAsync({
+      useFactory: async () => ormConfig,
+    }),
+  ],
   controllers: [AppController],
-  providers: [AppService, {
-    provide: APP_GUARD,
-    useClass: JwtAuthGuard
-  }],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
-export class AppModule {
-}
+export class AppModule {}
