@@ -11,21 +11,26 @@ import { FlashcardsService } from '../flashcards.service';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { IJwtSign } from '../../auth/interfaces/jwt-sign.interface';
 import { User } from '../../entity/user.entity';
+import { Flashcardbase } from '../../entity/flashcardbase.entity';
+import { CreateFlashcardDto } from '../dto/create-flashcard.dto';
 
 @Injectable()
 export class FlashcardsRepositoryService implements FlashcardsService {
   constructor(
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
-
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Flashcardbase)
+    private flashcardRepository: Repository<Flashcardbase>,
   ) {}
 
   public async findAllCategories(
-    options: IPaginationOptions,
-  ): Promise<Pagination<Category>> {
-    return paginate<Category>(this.categoryRepository, options);
+    options?: IPaginationOptions,
+  ): Promise<Pagination<Category> | Category[]> {
+    return !!options
+      ? paginate<Category>(this.categoryRepository, options)
+      : this.categoryRepository.find();
   }
 
   public async findAllCategoriesWithUsers(
@@ -72,6 +77,65 @@ export class FlashcardsRepositoryService implements FlashcardsService {
     const newCategory = await this.categoryRepository.create(category);
     const savedCategory = await this.categoryRepository.save(newCategory);
     return savedCategory.id_category;
+  }
+
+  public async findAllFlashcards(
+    categoryId: number,
+    options: IPaginationOptions,
+  ): Promise<Pagination<any>> {
+    return await paginate(this.flashcardRepository, options, {
+      where: {
+        category: await this.categoryRepository.findOne({
+          where: { id_category: categoryId },
+        }),
+      },
+    });
+  }
+
+  public async createFlashcard(
+    payload: CreateFlashcardDto,
+    jwtData: IJwtSign,
+  ): Promise<any> {
+    const isUsed = await FlashcardsRepositoryService.checkAlreadyUsed<Flashcardbase>(
+      this.flashcardRepository,
+      'FLASHCARD_ALREADY_EXISTS',
+      { title: payload.title },
+    );
+
+    if (!!isUsed) {
+      return;
+    }
+
+    const category = await this.categoryRepository.findOne({
+      id_category: payload.categoryId,
+    });
+
+    const creator = await this.getCreator(jwtData.username);
+    const flashCard = new Flashcardbase();
+    flashCard.creator = creator;
+    flashCard.description = payload.description;
+    flashCard.title = payload.title;
+    flashCard.category = category;
+
+    const newData = await this.flashcardRepository.create(flashCard);
+    const savedData = await this.flashcardRepository.save(newData);
+    return savedData.id_flashcardbase;
+  }
+
+  private static async checkAlreadyUsed<T>(
+    repository: Repository<T>,
+    error: string,
+    check: { [key: string]: string },
+  ): Promise<boolean> {
+    const db: T = await repository.findOne(check);
+    if (!!db) {
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+    }
+    return false;
+  }
+
+  private async getCreator(login: string): Promise<User> {
+    return await this.userRepository.findOne({ login });
   }
 
   //

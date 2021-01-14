@@ -2,12 +2,13 @@ import {
   Column,
   Entity,
   JoinColumn,
-  ManyToOne, OneToMany,
-  PrimaryGeneratedColumn
-} from "typeorm";
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Category } from './category.entity';
 import { User } from './user.entity';
-import { Question } from "./question.entity";
+import { Question } from './question.entity';
 
 @Entity()
 export class Flashcardbase {

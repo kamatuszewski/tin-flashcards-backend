@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Category } from '../entity/category.entity';
 import { FlashcardsRepositoryService } from './services/flashcards-repository.service';
 import { User } from '../entity/user.entity';
+import { Flashcardbase } from '../entity/flashcardbase.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Category, User])],
+  imports: [TypeOrmModule.forFeature([Category, User, Flashcardbase])],
   providers: [
     {
       provide: FlashcardsService,
