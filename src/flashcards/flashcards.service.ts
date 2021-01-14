@@ -1,41 +1,19 @@
-import { Injectable } from '@nestjs/common';
-import { Flashcard } from './flashcard';
-import { Flashcards } from './flashcards';
+import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
+import { Category } from '../entity/category.entity';
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { IJwtSign } from '../auth/interfaces/jwt-sign.interface';
 
-@Injectable()
-export class FlashcardsService {
-  private readonly flashcards: Flashcards = {
-    1: {
-      id: 1,
-      description: 'sadddddddddddddddddddddddddddddd',
-      title: 'tytul',
-      cover: 'cover',
-    },
-  };
+export abstract class FlashcardsService {
+  public abstract findAllCategories(
+    options: IPaginationOptions,
+  ): Promise<Pagination<Category>>;
 
-  public findAll(): Flashcards {
-    return this.flashcards;
-  }
+  public abstract findAllCategoriesWithUsers(
+    options: IPaginationOptions,
+  ): Promise<Pagination<Category>>;
 
-  public create(newFlashcard: Flashcard): void {
-    const id = Date.now();
-    this.flashcards[id] = { ...newFlashcard, id };
-  }
-
-  public find(id: number): Flashcard {
-    const flashCard = this.flashcards[id];
-    if (!flashCard) throw new Error('No flashcards found.');
-    return flashCard;
-  }
-
-  public update(payload: Flashcard): void {
-    if (!this.flashcards[payload.id]) throw new Error('No flashcards found.');
-    this.flashcards[payload.id] = payload;
-  }
-
-  public delete(id: number): void {
-    const flashcard: Flashcard = this.flashcards[id];
-    if (!flashcard) throw new Error('No flashcards found.');
-    delete this.flashcards[id];
-  }
+  public abstract createCategory(
+    payload: CreateCategoryDto,
+    jwtData: IJwtSign,
+  ): Promise<number>;
 }

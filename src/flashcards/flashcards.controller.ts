@@ -6,37 +6,56 @@ import {
   Param,
   Post,
   Put,
+  Query,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
-import { Flashcard } from './flashcard';
-import { Flashcards } from './flashcards';
 import { FlashcardsService } from './flashcards.service';
+import { Category } from '../entity/category.entity';
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { Public } from '../global/meta-data.global';
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 
-@Controller('flashcards')
+@Controller('api/flashcards')
 export class FlashcardsController {
   constructor(private readonly flashcardsService: FlashcardsService) {}
 
+  @Public()
   @Get()
-  public async findAll(): Promise<Flashcards> {
-    return this.flashcardsService.findAll();
+  public async findAll(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ): Promise<Pagination<Category>> {
+    return this.flashcardsService.findAllCategoriesWithUsers({ page, limit });
   }
 
-  @Get(':id')
-  public async find(@Param('id') id: number): Promise<Flashcard> {
-    return this.flashcardsService.find(id);
-  }
-
+  @UseGuards(JwtAuthGuard)
   @Post()
-  public create(@Body() flashcard: Flashcard): void {
-    this.flashcardsService.create(flashcard);
+  public async createCategory(
+    @Body() payload: CreateCategoryDto,
+    @Request() req: Request,
+  ): Promise<number> {
+    return this.flashcardsService.createCategory(payload, req['user']);
   }
 
-  @Put()
-  public update(@Body() flashcard: Flashcard): void {
-    this.flashcardsService.update(flashcard);
-  }
-
-  @Delete(':id')
-  public delete(@Param('id') id: number): void {
-    this.flashcardsService.delete(id);
-  }
+  // @Get(':id')
+  // public async find(@Param('id') id: number): Promise<Flashcard> {
+  //   return this.flashcardsService.find(id);
+  // }
+  //
+  // @Post()
+  // public create(@Body() flashcard: Flashcard): void {
+  //   this.flashcardsService.create(flashcard);
+  // }
+  //
+  // @Put()
+  // public update(@Body() flashcard: Flashcard): void {
+  //   this.flashcardsService.update(flashcard);
+  // }
+  //
+  // @Delete(':id')
+  // public delete(@Param('id') id: number): void {
+  //   this.flashcardsService.delete(id);
+  // }
 }
