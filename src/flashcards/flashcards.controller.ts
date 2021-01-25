@@ -32,6 +32,7 @@ export class FlashcardsController {
     return this.flashcardsService.findAllCategoriesWithUsers({ page, limit });
   }
 
+  @Public()
   @Get('/question-form-data')
   public async getDataForCreateFlashcard(): Promise<Category[]> {
     return this.flashcardsService.findAllCategories() as Promise<Category[]>;
