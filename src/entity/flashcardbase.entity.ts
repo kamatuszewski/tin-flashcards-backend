@@ -27,7 +27,9 @@ export class Flashcardbase {
   @Column({ default: Date.now().toLocaleString() })
   update_at: string;
 
-  @ManyToOne(() => Category, (category: Category) => category.flashcardbases)
+  @ManyToOne(() => Category, (category: Category) => category.flashcardbases, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   category: Category;
 

@@ -6,9 +6,12 @@ import { Category } from '../entity/category.entity';
 import { FlashcardsRepositoryService } from './services/flashcards-repository.service';
 import { User } from '../entity/user.entity';
 import { Flashcardbase } from '../entity/flashcardbase.entity';
+import { Question } from '../entity/question.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Category, User, Flashcardbase])],
+  imports: [
+    TypeOrmModule.forFeature([Category, User, Flashcardbase, Question]),
+  ],
   providers: [
     {
       provide: FlashcardsService,

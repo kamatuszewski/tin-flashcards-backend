@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 import { Flashcardbase } from './flashcardbase.entity';
+import { EStatusType } from '../flashcards/status-type.enum';
 
 @Entity()
 export class Category {
@@ -21,7 +22,7 @@ export class Category {
   created_at: string;
 
   @Column()
-  status: string;
+  status: EStatusType;
 
   @ManyToOne(() => User, (user: User) => user.categories)
   @JoinColumn()
@@ -30,6 +31,7 @@ export class Category {
   @OneToMany(
     () => Flashcardbase,
     (flashcardbase: Flashcardbase) => flashcardbase.category,
+    { onDelete: 'CASCADE' },
   )
   flashcardbases: Flashcardbase[];
 }

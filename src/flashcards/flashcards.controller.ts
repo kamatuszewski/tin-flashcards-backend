@@ -18,6 +18,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import { Flashcardbase } from '../entity/flashcardbase.entity';
 import { CreateFlashcardDto } from './dto/create-flashcard.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Controller('api/flashcards')
 export class FlashcardsController {
@@ -29,7 +30,21 @@ export class FlashcardsController {
     @Query('page') page = 1,
     @Query('limit') limit = 10,
   ): Promise<Pagination<Category>> {
-    return this.flashcardsService.findAllCategoriesWithUsers({ page, limit });
+    return this.flashcardsService.findAllCategories({ page, limit }) as Promise<
+      Pagination<Category>
+    >;
+  }
+
+  @Public()
+  @Get('manage')
+  public async findAllCategoryManage(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ): Promise<Pagination<Category>> {
+    return this.flashcardsService.findAllCategoriesForAdmin({
+      page,
+      limit,
+    }) as Promise<Pagination<Category>>;
   }
 
   @Public()
@@ -63,29 +78,18 @@ export class FlashcardsController {
     @Body() payload: CreateFlashcardDto,
     @Request() req: Request,
   ): Promise<any> {
-    return this.flashcardsService.createFlashcard(
-      payload,
-      req['user']
-    );
+    return this.flashcardsService.createFlashcard(payload, req['user']);
   }
 
-  // @Get(':id')
-  // public async find(@Param('id') id: number): Promise<Flashcard> {
-  //   return this.flashcardsService.find(id);
-  // }
-  //
-  // @Post()
-  // public create(@Body() flashcard: Flashcard): void {
-  //   this.flashcardsService.create(flashcard);
-  // }
-  //
-  // @Put()
-  // public update(@Body() flashcard: Flashcard): void {
-  //   this.flashcardsService.update(flashcard);
-  // }
-  //
-  // @Delete(':id')
-  // public delete(@Param('id') id: number): void {
-  //   this.flashcardsService.delete(id);
-  // }
+  @Delete('remove/:id')
+  public removeCategory(@Param('id') id: number): Promise<any> {
+    return this.flashcardsService.removeCategory(id);
+  }
+
+  @Put('change-status')
+  public changeStatusCategory(
+    @Body() payload: UpdateCategoryDto,
+  ): Promise<any> {
+    return this.flashcardsService.changeStatusCategory(payload);
+  }
 }

@@ -13,6 +13,10 @@ import { IJwtSign } from '../../auth/interfaces/jwt-sign.interface';
 import { User } from '../../entity/user.entity';
 import { Flashcardbase } from '../../entity/flashcardbase.entity';
 import { CreateFlashcardDto } from '../dto/create-flashcard.dto';
+import { Question } from '../../entity/question.entity';
+import { EStatusType } from '../status-type.enum';
+import { of } from 'rxjs';
+import { UpdateCategoryDto } from '../dto/update-category.dto';
 
 @Injectable()
 export class FlashcardsRepositoryService implements FlashcardsService {
@@ -23,9 +27,21 @@ export class FlashcardsRepositoryService implements FlashcardsService {
     private userRepository: Repository<User>,
     @InjectRepository(Flashcardbase)
     private flashcardRepository: Repository<Flashcardbase>,
+    @InjectRepository(Question)
+    private questionRepository: Repository<Question>,
   ) {}
 
   public async findAllCategories(
+    options?: IPaginationOptions,
+  ): Promise<Pagination<Category> | Category[]> {
+    return !!options
+      ? paginate<Category>(this.categoryRepository, options, {
+          where: { status: EStatusType.PUBLIC },
+        })
+      : this.categoryRepository.find();
+  }
+
+  public async findAllCategoriesForAdmin(
     options?: IPaginationOptions,
   ): Promise<Pagination<Category> | Category[]> {
     return !!options
@@ -33,21 +49,29 @@ export class FlashcardsRepositoryService implements FlashcardsService {
       : this.categoryRepository.find();
   }
 
-  public async findAllCategoriesWithUsers(
-    options: IPaginationOptions,
-  ): Promise<Pagination<Category>> {
-    const queryBuilder = this.categoryRepository.createQueryBuilder('category');
-    queryBuilder.leftJoinAndSelect('category.creator', 'user');
-    queryBuilder.select([
-      'category.id_category',
-      'category.title',
-      'category.created_at',
-      'category.status',
-      'user.id_user',
-      'user.login',
-    ]);
+  public async findAllMyFlashcards(userData: IJwtSign): Promise<any[]> {
+    // const queryBuilder = this.categoryRepository.createQueryBuilder('category');
+    // queryBuilder.leftJoinAndSelect('category.creator', 'user');
+    // queryBuilder.leftJoinAndSelect('category.flashcardbases', 'flashcard');
+    // queryBuilder.select([
+    //   'category.id_category',
+    //   'category.title',
+    //   'category.created_at',
+    //   'category.status',
+    //   'user.id_user',
+    //   'user.login',
+    // ]);
+    //
+    // return paginate<Category>(queryBuilder, options);
 
-    return paginate<Category>(queryBuilder, options);
+    const user = await this.userRepository.findOne({
+      id_user: userData.sub,
+    });
+
+
+    return await this.categoryRepository.find({
+      creator: user,
+    });
   }
 
   public async createCategory(
@@ -70,7 +94,7 @@ export class FlashcardsRepositoryService implements FlashcardsService {
     });
 
     const category = new Category();
-    category.status = 'false';
+    category.status = EStatusType.PRIVATE;
     category.created_at = new Date().toISOString();
     category.title = payload.title;
     category.creator = creator;
@@ -90,6 +114,34 @@ export class FlashcardsRepositoryService implements FlashcardsService {
         }),
       },
     });
+  }
+
+  public async removeCategory(payload: number): Promise<any> {
+    const category = await this.categoryRepository.findOne({
+      id_category: payload,
+    });
+    try {
+      await this.categoryRepository.remove(category);
+      return of(true);
+    } catch (e) {
+      throw new HttpException('CATEGORY_NO_REMOVE', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  public async changeStatusCategory(payload: UpdateCategoryDto): Promise<any> {
+    const category = await this.categoryRepository.findOne({
+      id_category: payload.id_category,
+    });
+    category.status = payload.status;
+    try {
+      await this.categoryRepository.update(
+        { id_category: payload.id_category },
+        category,
+      );
+      return of(true);
+    } catch (e) {
+      throw new HttpException('CATEGORY_NO_UPDATE', HttpStatus.BAD_REQUEST);
+    }
   }
 
   public async createFlashcard(

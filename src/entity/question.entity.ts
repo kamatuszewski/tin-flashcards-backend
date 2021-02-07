@@ -7,7 +7,6 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Flashcardbase } from './flashcardbase.entity';
-import { Questiontype } from './questiontype.entity';
 import { Answer } from './answer.entity';
 
 @Entity()
@@ -30,13 +29,6 @@ export class Question {
   )
   @JoinColumn()
   flashcarbase: Flashcardbase;
-
-  @ManyToOne(
-    () => Questiontype,
-    (questionType: Questiontype) => questionType.questions,
-  )
-  @JoinColumn()
-  questiontype: Questiontype;
 
   @OneToMany(() => Answer, (answer: Answer) => answer.question)
   answers: Answer[];
